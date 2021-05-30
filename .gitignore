@@ -1,0 +1,7 @@
+language_model/bert_pretrain/pytorch_model.bin
+weibo/saved_dict
+emotion_model_saved
+user_model_saved
+weibo
+history
+*/__pycache__
