@@ -3,7 +3,7 @@ from selenium import webdriver
 
 
 def get_login_cookies(path):
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(executable_path='./chromedriver')
     driver.get('https://weibo.com/login.php')
     login_url = driver.current_url
     while driver.current_url == login_url:

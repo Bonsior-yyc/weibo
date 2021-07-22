@@ -22,6 +22,7 @@ class Weibo(Model):
     weibo_url = CharField(null=True)
     user_url = CharField(null=True)
     register_time = CharField(null=True)
+    rumor = BooleanField(null=False)
 
     class Meta:
         database = db
@@ -43,7 +44,8 @@ class Weibo(Model):
             "weibo_number": self.weibo_number,
             "weibo_url": self.weibo_url,
             "user_url": self.user_url,
-            "register_time": self.register_time
+            "register_time": self.register_time,
+            "rumor": self.rumor
         }.__str__()
 
 

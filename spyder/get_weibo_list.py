@@ -1,6 +1,6 @@
 import time
 
-from spider.get_cookie import with_cookie
+from spyder.get_cookie import with_cookie
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -8,7 +8,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 @with_cookie
 def get_rumor_weibo_list(driver, start, end):
     with open("rumor_weibo_urls.txt", "w") as f:
-        driver.get('https://service.account.weibo.com/?type=5&status=0&page=' + str(start))
+        driver.get('https://service.account.weibo.com/?type=5&status=4&page=' + str(start))
         while True:
             weibo_url_list = driver.find_elements_by_class_name('m_table_tit')
             for weibo_url in weibo_url_list[1:]:
@@ -18,7 +18,7 @@ def get_rumor_weibo_list(driver, start, end):
             else:
                 start += 1
                 time.sleep(1)
-                driver.get('https://service.account.weibo.com/?type=5&status=0&page=' + str(start))
+                driver.get('https://service.account.weibo.com/?type=5&status=4&page=' + str(start))
 
 
 @with_cookie
@@ -95,9 +95,9 @@ def get_weibo_nromal_url():
 
 
 if __name__ == '__main__':
-    web_driver = webdriver.Chrome()
+    web_driver = webdriver.Chrome('./chromedriver')
     web_driver.get("https://weibo.com/login.php")
-    # get_rumor_weibo_list(web_driver, 1, 84)
-    # get_real_url(web_driver)
-    get_normal_url_list(driver=web_driver)
+    get_rumor_weibo_list(web_driver, 1, 500)
+    get_real_url(web_driver)
+    # get_normal_url_list(driver=web_driver)
     web_driver.close()
