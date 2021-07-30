@@ -8,10 +8,10 @@ import threading
 
 
 @with_cookie
-def get_weibo_content_and_comments(driver, url):
-    weibo_id = get_weibo(driver, url)
+def get_weibo_content_and_comments(driver, url, rumor=True):
+    weibo_id = get_weibo(driver, url, rumor=rumor)
     get_comment(driver, url, weibo_id)
-    print("Successfully saved:" + str(weibo_id))
+    print(threading.current_thread().name, "Successfully saved:" + str(weibo_id))
 
 
 if __name__ == '__main__':
@@ -23,32 +23,50 @@ if __name__ == '__main__':
     parser.add_argument('-w', '--worker', default=1, help='爬虫数量', type=int)
     args = parser.parse_args()
 
-    q = queue.Queue()
+    q_r = queue.Queue()
+    q_n = queue.Queue()
 
     if args.rumor:
         for url in get_weibo_rumour_url():
-            q.put(url)
+            q_r.put(url)
     if args.normal:
         for url in get_weibo_nromal_url():
-            q.put(url)
+            q_n.put(url)
 
-    print(q.unfinished_tasks)
+    print(q_r.unfinished_tasks)
+    print(q_n.unfinished_tasks)
 
 
-    def worker():
+    def worker_r():
         options = webdriver.ChromeOptions()
-        # options.add_argument('--headless')
-        # options.add_argument('--disable-gpu')
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
         driver = webdriver.Chrome(executable_path='./chromedriver', options=options)
         driver.get('https://weibo.com/login.php')
         while True:
-            url = q.get()
-            get_weibo_content_and_comments(driver, url)
-            q.task_done()
+            url = q_r.get()
+            get_weibo_content_and_comments(driver, url, rumor=True)
+            q_r.task_done()
+
+
+    def worker_n():
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
+        driver = webdriver.Chrome(executable_path='./chromedriver', options=options)
+        driver.get('https://weibo.com/login.php')
+        while True:
+            url = q_n.get()
+            get_weibo_content_and_comments(driver, url, rumor=False)
+            q_n.task_done()
 
 
     for i in range(args.worker):
-        threading.Thread(target=worker, daemon=True, name="spyder-" + str(i)).start()
+        threading.Thread(target=worker_r, daemon=True, name="spyder-r-" + str(i)).start()
 
-    q.join()
+    for i in range(args.worker):
+        threading.Thread(target=worker_n, daemon=True, name="spyder-n-" + str(i)).start()
+
+    q_r.join()
+    q_n.join()
     print('All work completed')
